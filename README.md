@@ -254,6 +254,19 @@ Copy `translations/en.yaml`, translate the values, create the corresponding dash
 
 ---
 
+
+## Credits & Acknowledgements
+
+The hardware design (peristaltic pump wiring, ESP32 setup) is based on a build
+originally published on **[Joy-Reef.com](https://www.joy-reef.com/)**.
+
+ReefDose is a complete software rewrite — the original used an Arduino with
+cloud connectivity. This project replaces that with a local ESP32 + ESPHome
+solution fully integrated into Home Assistant, with no cloud dependency.
+
+> If you know of earlier sources that inspired the Joy-Reef hardware design,
+> please let us know via [Issues](../../issues) so we can credit them properly.
+
 ## License
 
 Copyright (c) 2026 DIY Moi Ca
@@ -504,3 +517,19 @@ Copier `translations/en.yaml`, traduire les valeurs, créer le dashboard corresp
 
 ---
 
+## Crédits & Remerciements
+
+Le montage électronique (câblage des pompes péristaltiques, configuration ESP32)
+est basé sur un montage publié à l'origine sur **[Joy-Reef.com](https://www.joy-reef.com/)**.
+
+ReefDose est une réécriture logicielle complète — le montage original utilisait
+un Arduino avec une connexion cloud. Ce projet le remplace par une solution locale
+ESP32 + ESPHome entièrement intégrée à Home Assistant, sans aucune dépendance cloud.
+
+> Si vous connaissez des sources antérieures qui ont inspiré le montage Joy-Reef,
+> signalez-le via [Issues](../../issues) pour qu'on puisse les créditer correctement.
+
+## License
+
+Copyright (c) 2026 DIY Moi Ca — Usage personnel uniquement, pas d'usage commercial.
+Voir [LICENSE](LICENSE) pour les conditions complètes.
