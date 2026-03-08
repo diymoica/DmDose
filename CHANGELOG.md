@@ -1,194 +1,376 @@
 # Changelog — ReefDose
 
 All notable changes to this project are documented here.
-Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
+Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and [Semantic Versioning](https://semver.org/)
+
+**Versioning rules :**
+- **MAJOR** — complete rewrite or breaking architecture change
+- **MINOR** — significant new feature (new capability, new section, new mode)
+- **PATCH** — bug fix, minor improvement, text/label/icon change, translation update
 
 ---
 
-## [0.9.8] — 2026-03-08
+## [0.9.8]
+
+### Fixed
+- **Critical : trigger cache corruption after simulation**
+  - Root cause : `seconds: "00"` parameter in `time_pattern` triggers corrupted HA automation cache
+  - Symptom : automation fires but pump never doses — error `Cannot read properties of undefined`
+  - Fix : `seconds` parameter removed from all 4 auto dosing automations
+- **Critical : compatibility matrix bypassed at H:00**
+  - Root cause : all pumps triggered simultaneously — matrix checked elapsed time since previous cycle
+  - Fix : matrix removed from automation conditions — offset system handles sequencing
+- **Offset not applied to auto dosing timing**
+  - `rd_pX_offset_min` was only wired to "Missed dose" automations, not "Auto dosing"
+  - Fix : offset now integrated into timing condition of all 4 auto dosing automations
+- **Global dose delay causing unpredictable sequencing**
+  - Fixed delay in minutes caused drift and made the matrix unreliable
+  - Fix : replaced by a short configurable mechanical delay in seconds (default 5s)
+- **Header toggle in Global settings accidentally toggling simulation mode**
+  - Fix : `show_header_toggle: false` added to Global card
+
 ### Added
-- **Simulation mode** — test the system without affecting real data
-  - `input_boolean.rd_sim_mode` : enable/disable simulation mode
-  - `input_number.rd_sim_interval` : configurable firing interval (1–10 min)
-  - `input_boolean.rd_sim_real_pumps` : optionally trigger real pumps during simulation
-  - Stats fully protected when active : counters, tank volumes and totals are not modified
+- Automatic offset calculation from compatibility matrix (`rd_auto_calculate_offsets`)
+- Automatic `automation.reload` when simulation mode turns OFF
+- Mechanical delay between doses now configurable (1–30s, default 5s) — `input_number.rd_dose_delay`
+- Notification test button in Settings → Global
+- Startup checklist card in Settings tab
+- Simulation sub-options auto-hide when simulation is OFF
+- Simulation options reset when simulation turns OFF
+
+---
+
+## [0.9.7]
+
+### Added
+- Simulation mode (`input_boolean.rd_sim_mode`)
+  - Configurable interval (1–10 min)
+  - Real pump toggle (`input_boolean.rd_sim_real_pumps`)
+  - Stats fully protected — counters, tank volumes and totals not modified
   - `last_dose` timestamp still updates for timing verification
-  - Red warning banner displayed on the Control dashboard when simulation is active
-  - Simulation controls added to Settings dashboard, Global section
+  - Red warning banner on Control dashboard when active
 
 ### Fixed
-- Auto dosing automations blocked each other when firing simultaneously at H:00
-  - Root cause : P1 set the dose lock to ON, blocking P2/P3/P4 until the next hour
-  - Fix : dose lock condition removed from auto dosing automations — the queued script handles sequencing natively
-
-### Changed
-- `input_boolean.rd_test_mode` (introduced in v0.9.7) renamed to `input_boolean.rd_sim_mode`
-- Global dose delay max reduced from 60 to 5 minutes — mechanical use only, chemical delays belong in the compatibility matrix
+- Auto dosing automations blocked each other at H:00
+  - Fix : dose lock condition removed — queued script handles sequencing natively
 
 ---
 
-## [0.9.7] — 2026-03-08
+## [0.9.6]
+
 ### Fixed
-- Automatic dosing was completely non-functional
-  - Root cause : empty message field in Pump 4 alert caused YAML parser to discard the 4 auto dosing automations
-  - Fix : message restored, automations now present and active
-- Timezone error when comparing last dose timestamp with current time
-  - Error : `TypeError: can't subtract offset-naive and offset-aware datetimes`
-  - Fix : `strptime()` replaced with `as_datetime().replace(tzinfo=now().tzinfo)` (16 occurrences)
+- Automatic dosing completely non-functional
+  - Root cause : empty message in Pump 4 alert caused YAML parser to discard 4 automations
+- Timezone error when comparing last dose timestamp
+  - `strptime()` replaced with `as_datetime().replace(tzinfo=now().tzinfo)` (16 occurrences)
 - Duplicate entity definitions between `rd_config.yaml` and `rd_stat.yaml`
-  - Affected : `total_volume`, `total_doses`, `missed_doses`, `last_dose` × 4 pumps
-  - Fix : removed from `rd_config.yaml`, kept in `rd_stat.yaml`
-- Status icon always displayed red regardless of pump state
-  - Root cause : dashboard tested a French string (`'En ligne'`) but sensor returns English (`'Online'`)
-  - Fix : now tests `binary_sensor.reefdose_status` directly — works in any language
-- "Dosing in progress" indicator was not tappable — no way to manually reset a stuck dose lock
-  - Fix : tap action added with confirmation dialog
-
-### Added
-- Initial test mode toggle `input_boolean.rd_test_mode` (replaced by simulation mode in v0.9.8)
-
-### Changed
-- Global dose delay capped at 5 min max (was 60)
-- Dashboard labels and explanatory text updated to clarify mechanical vs chemical delays
+- Status icon always red regardless of pump state
+- "Dosing in progress" indicator not tappable — no way to reset stuck dose lock
 
 ---
 
-## [0.9.6] — 2026-03-07
+## [0.9.5]
+
 ### Fixed
-- Dosing window rejected when end time is set to midnight (0h00)
-  - Example : start 22h00 → end 0h00 showed "End before start" and a -1320 min interval
-  - Fix : end time = 0h00 is now treated as 1440 minutes (end of day)
+- Dosing window rejected when end time is midnight (0h00)
+  - Fix : 0h00 now treated as 1440 minutes (end of day)
 
 ---
 
-## [0.9.5] — 2026-03-07
+## [0.9.4]
+
 ### Added
 - Full day mode per pump (`input_boolean.rd_pX_full_day`)
-  - ON (default) : doses spread evenly across 24h, aligned to clock hours
-  - OFF : custom window with start and end time
-  - Start/end time fields hidden when full day is ON
-- Tank refilled scripts — "Tank refilled!" button was returning an error (scripts were missing)
-- Explanatory text above compatibility matrix in all 4 dashboards
+  - ON : doses spread across 24h, aligned to clock hours
+  - OFF : custom window with start/end time
+- Tank refilled scripts (were missing, caused errors)
+- Explanatory text above compatibility matrix
 
 ### Fixed
 - Pump names displayed as raw Jinja template in bar-card and glance cards
-- "Next dose" sensor showed "Tomorrow" immediately after enabling full day mode
+- "Next dose" showed "Tomorrow" immediately after enabling full day mode
 - Calibration mode did not deactivate after pump run
 
 ---
 
-## [0.9.4] — 2026-03-07
-### Added
-- Manual dose cycle reset option per pump (`input_boolean.rd_pX_manual_resets_cycle`)
-  - OFF (default) : manual dose is out-of-cycle, auto schedule continues unchanged
-  - ON : manual dose resets the cycle — next auto dose fires 1 interval after the manual dose
+## [0.9.3]
 
-### Changed
-- Theme CSS variables renamed from pump-specific names to universal `p1/p2/p3/p4` scheme
-  - `kh-color` → `p1-color`, `ca-color` → `p2-color`, etc.
-
----
-
-## [0.9.3] — 2026-03-07
 ### Added
 - Free pump name per pump (`input_text.rd_pX_name`)
-  - Displayed dynamically in all dashboard section headers
-  - Default : "Pump 1" / "Pump 2" / "Pump 3" / "Pump 4"
-  - Examples : "Kh", "Ca", "Nutrient A", "pH Up", "Engrais N"...
+- Manual dose cycle reset option (`input_boolean.rd_pX_manual_resets_cycle`)
+
+### Changed
+- Theme CSS variables renamed to universal `p1/p2/p3/p4` scheme
 
 ---
 
-## [0.9.2] — 2026-03-07
+## [0.9.2]
+
 ### Added
 - Compatibility matrix — 6 configurable minimum delays between pump pairs
-  - p1↔p2, p1↔p3, p1↔p4, p2↔p3, p2↔p4, p3↔p4
-  - Set to 0 to allow two pumps to dose back-to-back
-  - Dose blocked and counted as missed if delay not elapsed
-- Settings dashboard section for compatibility matrix
 
 ---
 
-## [0.9.1] — 2026-03-07
+## [0.9.1]
+
 ### Added
-- Dosing window per pump (start time → end time)
-- Interval sensor per pump (auto-calculated from window and frequency)
-- Window validation sensor : OK / "Too many doses for window" / "End before start"
-- Automations blocked automatically when window configuration is invalid
-- "Next dose" sensor updated to show "Tomorrow" after end time
+- Dosing window per pump (start/end time)
+- Interval sensor, window validation sensor
+- "Next dose" countdown sensor per pump
 
 ---
 
-## [0.9.0] — 2026-03-07
+## [0.9.0]
+
 ### Added
 - Fixed start time per pump
-- Dosing schedule derived from start time + frequency
-- "Next dose" sensor per pump (countdown to next scheduled dose)
 - Per-minute trigger for exact scheduling (was hourly)
 
 ---
 
-## [0.8.0] — 2026-03-07
+## [0.8.0]
+
 ### Added
-- Full English translation of all package files
-- Multi-language support : FR / EN / ES / IT / DE translation files
-- GitHub-ready structure
-- Split into 5 modular package files
-- DMC Theme with CSS variables for pump colors
-- Desktop dashboard FR + EN, Mobile dashboard FR + EN
+- Full English translation, multi-language support (FR / EN / ES / IT / DE)
+- GitHub-ready structure, 5 modular package files
+- DMC Theme with CSS variables, desktop + mobile dashboards (FR + EN)
 - Full reset button with confirmation
 
 ---
 
-## [0.7.0] — 2026-03-07
+## [0.7.0]
+
 ### Added
-- DMC color theme via HA CSS variables
+- DMC color theme via CSS variables
 - Mini Graph Card — 7-day tank level history
 - Mobile dashboard (2-column layout)
 
 ---
 
-## [0.6.0] — 2026-03-05
+## [0.6.0]
+
 ### Added
 - ESPHome binary sensor for connection status
 - 3-view dashboard : Control / Settings / Statistics
-- 4-column grid layout
 
 ---
 
-## [0.5.0] — 2026-03-05
+## [0.5.0]
+
 ### Added
-- Single ESPHome device setup
-- Package structure with `!include_dir_named`
-- Notification group (`notify.reefdose_admin`)
+- Single ESPHome device setup, package structure
 
 ---
 
-## [0.4.0] — 2026-03-04
+## [0.4.0]
+
 ### Added
 - Split monolithic YAML into 5 modular files
 
 ---
 
-## [0.3.0] — 2026-03-03
+## [0.3.0]
+
 ### Added
-- Complete statistics : daily / weekly / monthly / yearly volumes, missed doses, timestamps
-- Daily counter reset at midnight
+- Complete statistics : daily / weekly / monthly / yearly volumes, missed doses
 
 ---
 
-## [0.2.0] — 2026-03-03
+## [0.2.0]
+
 ### Added
-- Calibration system per pump (ml/s flow rate measurement)
-- Tank level tracking (remaining volume, %, days remaining, alert threshold)
-- Low tank alert notifications
-- Anti-overlap system
+- Calibration system, tank level tracking, alerts, anti-overlap
 
 ---
 
-## [0.1.0] — 2026-03-03
+## [0.1.0]
+
 ### Added
 - Initial release — 4 pumps via ESP32 / ESPHome
-- Automatic dosing (daily dose, frequency, offset)
-- Manual dose trigger per pump
-- Auto mode toggle and global pause
-- Basic dashboard (Mushroom + Bar Card)
+- Automatic dosing, manual dose, auto mode toggle, global pause
+
+---
+---
+
+# Journal des modifications — ReefDose
+
+Toutes les modifications notables sont documentées ici.
+Format basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) et [Semantic Versioning](https://semver.org/)
+
+**Règles de versioning :**
+- **MAJEUR** — réécriture complète ou changement d'architecture cassant
+- **MINEUR** — nouvelle fonctionnalité significative (nouvelle capacité, nouvelle section, nouveau mode)
+- **PATCH** — correction de bug, amélioration mineure, changement de texte/label/icône, traduction
+
+---
+
+## [0.9.8]
+
+### Corrigé
+- **Critique : corruption du cache des triggers après simulation**
+  - Cause : `seconds: "00"` dans les triggers `time_pattern` corrompait le cache HA
+  - Symptôme : l'automation se déclenche mais la pompe ne dose jamais
+  - Correction : paramètre `seconds` retiré des 4 automations de dosage automatique
+- **Critique : matrice de compatibilité contournée à H:00**
+  - Cause : toutes les pompes se déclenchaient simultanément
+  - Correction : matrice retirée des conditions — le système d'offsets gère le séquençage
+- **Offset non appliqué au timing du dosage automatique**
+  - `rd_pX_offset_min` n'était branché qu'aux automations "Dose manquée"
+  - Correction : offset intégré dans la condition de timing des 4 automations
+- **Délai global causant un séquençage imprévisible**
+  - Correction : remplacé par un délai mécanique court configurable en secondes (défaut 5s)
+- **Toggle d'en-tête de la carte Global déclenchait accidentellement le mode simulation**
+  - Correction : `show_header_toggle: false` ajouté
+
+### Ajouté
+- Calcul automatique des offsets depuis la matrice (`rd_auto_calculate_offsets`)
+- `automation.reload` automatique à la désactivation du mode simulation
+- Délai mécanique entre doses configurable (1–30s, défaut 5s)
+- Bouton test notifications dans Réglages → Global
+- Checklist de démarrage dans l'onglet Réglages
+- Sous-options simulation masquées quand simulation = OFF
+- Reset des options simulation à la désactivation
+
+---
+
+## [0.9.7]
+
+### Ajouté
+- Mode simulation (`input_boolean.rd_sim_mode`)
+  - Intervalle configurable (1–10 min)
+  - Toggle pompes réelles (`input_boolean.rd_sim_real_pumps`)
+  - Stats entièrement protégées
+  - Bannière rouge sur le dashboard Contrôle
+
+### Corrigé
+- Les automations de dosage se bloquaient mutuellement à H:00
+
+---
+
+## [0.9.6]
+
+### Corrigé
+- Dosage automatique complètement non-fonctionnel (champ message vide dans alerte P4)
+- Erreur de fuseau horaire lors de la comparaison des timestamps (16 occurrences)
+- Définitions d'entités en double entre `rd_config.yaml` et `rd_stat.yaml`
+- Icône statut toujours rouge peu importe l'état
+- Indicateur "Dose en cours" non cliquable
+
+---
+
+## [0.9.5]
+
+### Corrigé
+- Fenêtre de dosage rejetée quand l'heure de fin est minuit (0h00)
+
+---
+
+## [0.9.4]
+
+### Ajouté
+- Mode journée entière par pompe (`input_boolean.rd_pX_full_day`)
+- Scripts "Bidon rempli"
+- Texte explicatif au-dessus de la matrice de compatibilité
+
+### Corrigé
+- Noms des pompes affichés comme template Jinja brut
+- "Prochaine dose" affichait "Demain" juste après l'activation du mode journée entière
+- Mode calibration ne se désactivait pas après l'exécution
+
+---
+
+## [0.9.3]
+
+### Ajouté
+- Nom libre par pompe (`input_text.rd_pX_name`)
+- Option reset de cycle par dose manuelle (`input_boolean.rd_pX_manual_resets_cycle`)
+
+### Modifié
+- Variables CSS du thème renommées en schéma universel `p1/p2/p3/p4`
+
+---
+
+## [0.9.2]
+
+### Ajouté
+- Matrice de compatibilité — 6 délais minimaux configurables entre paires de pompes
+
+---
+
+## [0.9.1]
+
+### Ajouté
+- Fenêtre de dosage par pompe (heure début/fin)
+- Capteur d'intervalle, capteur de validation de fenêtre
+- Capteur compte à rebours "Prochaine dose"
+
+---
+
+## [0.9.0]
+
+### Ajouté
+- Heure de démarrage fixe par pompe
+- Trigger à la minute pour un planning précis
+
+---
+
+## [0.8.0]
+
+### Ajouté
+- Traduction anglaise complète, support multilingue (FR / EN / ES / IT / DE)
+- Structure GitHub, 5 fichiers de packages modulaires
+- Thème DMC, dashboards desktop + mobile FR + EN
+- Bouton reset complet avec confirmation
+
+---
+
+## [0.7.0]
+
+### Ajouté
+- Thème DMC via variables CSS
+- Mini Graph Card — historique 7 jours des niveaux
+- Dashboard mobile
+
+---
+
+## [0.6.0]
+
+### Ajouté
+- Capteur binaire ESPHome pour le statut de connexion
+- Dashboard 3 vues : Contrôle / Réglages / Statistiques
+
+---
+
+## [0.5.0]
+
+### Ajouté
+- Appareil ESPHome unique, structure de packages
+
+---
+
+## [0.4.0]
+
+### Ajouté
+- Découpage du YAML monolithique en 5 fichiers modulaires
+
+---
+
+## [0.3.0]
+
+### Ajouté
+- Statistiques complètes : volumes journalier / hebdo / mensuel / annuel, doses manquées
+
+---
+
+## [0.2.0]
+
+### Ajouté
+- Calibration, suivi des niveaux, alertes, anti-chevauchement
+
+---
+
+## [0.1.0]
+
+### Ajouté
+- Version initiale — 4 pompes via ESP32 / ESPHome
+- Dosage automatique, dose manuelle, toggle auto, pause globale
