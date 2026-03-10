@@ -18,7 +18,7 @@ Core dosing features are functional and validated. The goal of v1.0.0 is to conf
 - Automatic dosing — 4 pumps, configurable time window per pump
 - Full day mode — clock-aligned dosing (e.g. 24 doses → every hour at :00)
 - Compatibility matrix — minimum delay between each pump pair, offsets calculated automatically
-- Manual dose — triggerable at any time
+- Manual dose — triggerable at any time from the dashboard
 - Cycle reset option — manual dose can optionally shift the auto schedule
 - Real-time validation — warning when configuration is inconsistent
 - Calibration — real flow rate measurement (ml/s)
@@ -27,7 +27,7 @@ Core dosing features are functional and validated. The goal of v1.0.0 is to conf
 - 7-day tank level graph
 - Push notifications — pump offline, low tank, missed dose
 - Simulation mode — test timing and sequencing without affecting real data
-- Automatic reload after simulation ends
+- Automatic automation reload after simulation ends
 - Global pause
 - Full reset with confirmation
 - Desktop + mobile dashboard (FR / EN)
@@ -37,41 +37,44 @@ Core dosing features are functional and validated. The goal of v1.0.0 is to conf
 
 ### 🔜 v1.0.0 — First stable release
 
-- Hardware safety timeout (ESP32 globals, configured via tutorial)
-- HA watchdog (soft + hard levels)
-- Responsive single-file dashboard (desktop + mobile merged)
-- Interactive setup tutorial (7 steps)
-- Complete real-world validation (48h continuous run)
-- Final documentation
+- Complete real-world validation (48h continuous run) ✅ in progress
+- Fix : overdosing when changing pump mode mid-day
+- Final documentation and GitHub release
 
 ---
 
-### 🔮 v1.1.0 — Planned
+### 🔜 v1.1.0 — Safety first
 
-#### Recalculate remaining doses on config change
-When a pump's schedule is changed mid-day, the system currently ignores doses already delivered and creates a full new plan — causing overdosing.
+- **Hardware safety timeout** — ESP32 cuts the pump automatically after a configurable max duration, preventing flooding in case of HA crash or automation failure
+- **HA watchdog (soft + hard)** — soft level : pump OFF + warning notification / hard level : all pumps OFF + urgent notification
+- **Physical manual dose button** — a hardware button on the ESP32 triggers a manual dose exactly like the dashboard button, with HA confirmation and stats update. Works even if the dashboard is unreachable.
 
-Fix : on any config change, read `counter.rd_pX_daily_count`, calculate remaining doses = new frequency - already delivered, and spread only what's left across the remaining window. If already at or above the new frequency → block until midnight with a warning.
+---
 
-**Complexity : medium (2–3h). Workaround until then : avoid changing pump mode mid-day.**
+### 🔜 v1.2.0 — Precision and coherence
 
-#### Precision improvement — sub-second dose duration
-Dose durations are currently calculated as integers (whole seconds).
-Fix : use float durations (0.1s resolution) for 10× better precision on small doses.
+- **Recalculate remaining doses on config change** — when a pump's schedule is changed mid-day, the system currently ignores doses already delivered and creates a full new plan, causing overdosing. Fix : read daily counter and spread only remaining doses across the remaining window.
+- **Sub-second dose precision** — dose durations currently rounded to whole seconds. Fix : float durations (0.1s resolution) for 10× better precision on small doses.
+- **Volume coherence** — prevent setting remaining volume or alert threshold above tank capacity. Fix : dynamically cap `input_number` max when tank volume changes.
 
-#### Configurable volume limits (tank / remaining / alert threshold)
-Prevent the user from setting a remaining volume or alert threshold above the tank capacity.
-Fix : dynamically update the `max` of `input_number` entities when tank volume changes.
+---
+
+### 🔜 v1.3.0 — User experience
+
+- **Responsive single-file dashboard** — desktop + mobile merged into one adaptive file
+- **Interactive setup tutorial** — 7-step guided onboarding (notifications, calibration, safety, dosing config, compatibility, simulation, production)
+
+---
+
+### 🔮 Future versions
 
 #### Emergency Bluetooth mode
 When WiFi is unavailable, the ESP32 can be controlled via Bluetooth as an emergency fallback.
 Minimal interface : trigger a manual dose per pump. No stats, no schedule — just keep the tank alive.
-Requires a lightweight BLE interface or companion app.
 
 #### ESP32 offline fallback
-When Home Assistant is unreachable, the ESP32 continues dosing independently using a local schedule stored directly in ESPHome. Statistics are synchronized when HA reconnects.
-
-Requires an external RTC module (DS3231 recommended, ~2-5€) for accurate timekeeping without WiFi.
+When Home Assistant is unreachable, the ESP32 continues dosing independently using a local schedule stored in ESPHome. Statistics are synchronized when HA reconnects.
+Requires an external RTC module for accurate timekeeping without WiFi.
 
 #### Modular pump expansion
 Support for more than 4 pumps via additional ESP32 modules (`reefdose_2`, `reefdose_3`...).
@@ -79,6 +82,13 @@ All modules managed from a single dashboard.
 
 #### Per-pump color customization
 Choose pump colors directly from the dashboard, without editing theme files.
+
+#### Event-based dosing (lights integration)
+Trigger doses relative to lighting events (after lights on / after lights off + configurable delay).
+Requires a separate lighting automation project.
+
+#### Magnetic stirrer support
+Dedicated ESP32 module for stirring each reservoir before dosing.
 
 ---
 
@@ -88,6 +98,8 @@ Choose pump colors directly from the dashboard, without editing theme files.
 - Weekly dose summary push report (every Monday)
 - Holiday / pause mode (suspend dosing for X days)
 - Multi-system support (2 independent dosing setups on the same HA instance)
+- Dose history export (CSV)
+- Advanced statistics (missed dose rate %, real vs configured volume comparison)
 
 ---
 
@@ -113,7 +125,7 @@ Les fonctionnalités de dosage sont opérationnelles et validées. L'objectif de
 - Dosage automatique — 4 pompes, fenêtre horaire configurable par pompe
 - Mode jour entier — dosage aligné sur l'horloge (ex : 24 doses → toutes les heures à :00)
 - Matrice de compatibilité — délai minimum entre chaque paire de pompes, offsets calculés automatiquement
-- Dose manuelle — déclenchable à tout moment
+- Dose manuelle — déclenchable à tout moment depuis le dashboard
 - Option reset de cycle — une dose manuelle peut décaler le planning automatique
 - Validation en temps réel — alerte si la configuration est incohérente
 - Calibration — mesure du débit réel (ml/s)
@@ -132,40 +144,44 @@ Les fonctionnalités de dosage sont opérationnelles et validées. L'objectif de
 
 ### 🔜 v1.0.0 — Première release stable
 
-- Sécurité hardware timeout (globals ESP32, configuré via tutoriel)
-- Watchdog HA (niveaux doux + dur)
-- Dashboard responsive fichier unique (desktop + mobile fusionnés)
-- Tutoriel d'installation interactif (7 étapes)
-- Validation complète en conditions réelles (run continu 48h)
-- Documentation finale
+- Validation complète en conditions réelles (run continu 48h) ✅ en cours
+- Correction : surdosage lors du changement de mode en cours de journée
+- Documentation finale et release GitHub
 
 ---
 
-### 🔮 v1.1.0 — Prévu
+### 🔜 v1.1.0 — Sécurité avant tout
 
-#### Recalcul des doses restantes lors d'un changement de config
-Quand la configuration d'une pompe change en cours de journée, le système ignore les doses déjà livrées et crée un nouveau planning complet — causant un surdosage.
+- **Timeout de sécurité hardware** — l'ESP32 coupe la pompe automatiquement après une durée max configurable, en cas de crash HA ou de défaillance d'automation
+- **Watchdog HA (doux + dur)** — niveau doux : pompe OFF + notification warning / niveau dur : toutes les pompes OFF + notification urgence
+- **Bouton de dose manuelle physique** — un bouton hardware sur l'ESP32 déclenche une dose manuelle exactement comme le bouton du dashboard, avec confirmation HA et mise à jour des stats. Fonctionne même si le dashboard est inaccessible.
 
-Correction : à chaque changement de config, lire `counter.rd_pX_daily_count`, calculer les doses restantes = nouvelle fréquence - doses déjà livrées, et n'étaler que ce qui reste sur la fenêtre restante. Si le compteur atteint déjà la nouvelle fréquence → blocage jusqu'à minuit avec warning.
+---
 
-**Complexité : moyenne (2–3h). Contournement en attendant : éviter de changer le mode d'une pompe en cours de journée.**
+### 🔜 v1.2.0 — Précision et cohérence
 
-#### Précision — durées de dose en dixièmes de seconde
-Les durées sont actuellement calculées en secondes entières.
-Correction : utiliser des valeurs float (résolution 0.1s) pour une précision 10× supérieure sur les petites doses.
+- **Recalcul des doses restantes lors d'un changement de config** — quand la configuration change en cours de journée, le système ignore les doses déjà livrées et crée un nouveau planning complet, causant un surdosage. Correction : lire le compteur journalier et n'étaler que les doses restantes sur la fenêtre restante.
+- **Précision sub-seconde** — les durées de dose sont actuellement arrondies à la seconde entière. Correction : valeurs float (résolution 0.1s) pour une précision 10× supérieure sur les petites doses.
+- **Cohérence des volumes** — empêcher de saisir un volume restant ou un seuil d'alerte supérieur au volume du réservoir. Correction : plafonner dynamiquement le `max` des `input_number` quand le volume du réservoir change.
 
-#### Limites de volume cohérentes (réservoir / restant / seuil alerte)
-Empêcher l'utilisateur de saisir un volume restant ou un seuil d'alerte supérieur au volume du réservoir.
-Correction : mettre à jour dynamiquement le `max` des `input_number` quand le volume du réservoir change.
+---
+
+### 🔜 v1.3.0 — Expérience utilisateur
+
+- **Dashboard responsive fichier unique** — desktop + mobile fusionnés en un seul fichier adaptatif
+- **Tutoriel d'installation interactif** — 7 étapes guidées (notifications, calibration, sécurité, config dosage, compatibilité, simulation, production)
+
+---
+
+### 🔮 Versions futures
 
 #### Mode urgence Bluetooth
 En cas de perte WiFi, l'ESP32 peut être contrôlé via Bluetooth en mode urgence.
 Interface minimale : déclencher une dose manuelle par pompe. Pas de stats, pas de planning — juste garder le bac en vie.
 
 #### Dosage offline ESP32
-Quand Home Assistant est inaccessible, l'ESP32 continue à doser de manière autonome grâce à un planning stocké directement dans ESPHome. Les statistiques sont synchronisées au retour de la connexion.
-
-Nécessite un module RTC externe (DS3231 recommandé, ~2-5€) pour maintenir l'heure sans WiFi.
+Quand Home Assistant est inaccessible, l'ESP32 continue à doser de manière autonome grâce à un planning stocké dans ESPHome. Les statistiques sont synchronisées au retour de la connexion.
+Nécessite un module RTC externe pour maintenir l'heure sans WiFi.
 
 #### Expansion modulaire des pompes
 Support de plus de 4 pompes via des modules ESP32 supplémentaires (`reefdose_2`, `reefdose_3`...).
@@ -173,6 +189,13 @@ Tous les modules gérés depuis un seul dashboard.
 
 #### Personnalisation des couleurs par pompe
 Choisir les couleurs des pompes directement depuis le dashboard, sans modifier les fichiers de thème.
+
+#### Dosage déclenché par événement (intégration lumières)
+Déclencher les doses par rapport aux événements d'éclairage (après allumage / après extinction + délai configurable).
+Nécessite un projet d'automation lumières séparé.
+
+#### Support agitateur magnétique
+Module ESP32 dédié pour agiter chaque réservoir avant le dosage.
 
 ---
 
@@ -182,6 +205,8 @@ Choisir les couleurs des pompes directement depuis le dashboard, sans modifier l
 - Rapport hebdomadaire par push (chaque lundi)
 - Mode vacances / pause (suspendre le dosage pendant X jours)
 - Support multi-système (2 systèmes de dosage indépendants sur le même HA)
+- Export de l'historique des doses (CSV)
+- Statistiques avancées (taux de doses manquées %, comparaison volume réel vs configuré)
 
 ---
 
