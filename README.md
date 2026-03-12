@@ -24,7 +24,7 @@ Each pump is fully configurable — name, schedule, frequency, compatibility wit
 No logic is imposed : you decide everything.
 
 > ⚠️ **Pre-release** — actively tested on a real reef aquarium. Core features are functional and validated.
-> See the [ROADMAP](ROADMAP.md) for what's coming before v1.0.0.
+> See the [ROADMAP](ROADMAP.md) for what's coming next.
 
 ---
 
@@ -44,7 +44,7 @@ No logic is imposed : you decide everything.
 - **Global pause** — stops all pumps instantly
 
 #### Hardware
-- **Physical manual dose button** — a hardware button on the ESP32 triggers a manual dose, works even without dashboard access *(coming in v1.1.0)*
+- **Physical manual dose button** — a hardware button on the ESP32 triggers a manual dose, works even without dashboard access *(coming soon)*
 
 #### Simulation
 - **Simulation mode** — test full timing and sequencing without affecting real data
@@ -290,7 +290,7 @@ Chaque pompe est entièrement configurable — nom, plage horaire, fréquence, c
 Aucune logique n'est imposée : vous décidez de tout.
 
 > ⚠️ **Pré-release** — testé activement sur un aquarium récifal réel. Les fonctionnalités principales sont opérationnelles.
-> Voir la [ROADMAP](ROADMAP.md) pour ce qui arrive avant v1.0.0.
+> Voir la [ROADMAP](ROADMAP.md) pour ce qui arrive bientôt.
 
 ---
 
@@ -310,7 +310,7 @@ Aucune logique n'est imposée : vous décidez de tout.
 - **Pause globale** — arrête toutes les pompes instantanément
 
 #### Matériel
-- **Bouton de dose manuelle physique** — un bouton hardware sur l'ESP32 déclenche une dose manuelle, fonctionne même sans accès au dashboard *(prévu en v1.1.0)*
+- **Bouton de dose manuelle physique** — un bouton hardware sur l'ESP32 déclenche une dose manuelle, fonctionne même sans accès au dashboard *(bientôt)*
 
 #### Simulation
 - **Mode simulation** — testez le timing complet sans affecter les données réelles
