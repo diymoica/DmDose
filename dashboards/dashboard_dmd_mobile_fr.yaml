@@ -1,0 +1,1188 @@
+# ============================================================
+#  Copyright (c) 2026 DIY Moi Ca — diymoica.com
+#  License : Custom — personal use only, no commercial use
+#  See LICENSE file at github.com/diymoica/dmd
+# ============================================================
+
+# ============================================================
+#  DASHBOARD MOBILE DMD — 2 colonnes
+#  Les couleurs sont dans themes/default.yaml
+# ============================================================
+kh_color: &kh_color "#F5C518"
+ca_color: &ca_color "#E8547A"
+mg_color: &mg_color "#4A9FD4"
+ph_color: &ph_color "#2ECC71"
+# ============================================================
+
+title: DIY my Dose Mobile
+views:
+
+##################################################################################################################################
+#  VUE 1 : CONTROLE
+##################################################################################################################################
+
+  - title: Controle
+    path: controle
+    icon: mdi:pump
+    cards:
+
+      - type: custom:mushroom-template-card
+        primary: DIY my Dose
+        secondary: "{{ states('sensor.dmd_status') }}"
+        icon: mdi:server-network
+        icon_color: >-
+          {% if is_state('binary_sensor.dmd_status', 'on') %}green{% else %}red{% endif %}
+        tap_action:
+          action: none
+
+      - type: horizontal-stack
+        cards:
+          - type: custom:mushroom-entity-card
+            entity: input_boolean.dmd_pause
+            name: "Pause toutes pompes"
+            icon: mdi:pause-circle
+            tap_action:
+              action: toggle
+          - type: custom:mushroom-entity-card
+            entity: input_boolean.dmd_dosing
+            name: "Dose en cours"
+            icon: mdi:lock
+            tap_action:
+              action: toggle
+              confirmation:
+                text: "Forcer la réinitialisation du verrou de dosage ?"
+
+      - type: custom:bar-card
+        title: "Niveau des reservoirs (%)"
+        entities:
+          - entity: sensor.dmd_p1_tank_pct
+            color: *kh_color
+          - entity: sensor.dmd_p2_tank_pct
+            color: *ca_color
+          - entity: sensor.dmd_p3_tank_pct
+            color: *mg_color
+          - entity: sensor.dmd_p4_tank_pct
+            color: *ph_color
+        columns: 2
+        height: 40px
+        positions:
+          icon: "off"
+          name: inside
+          value: inside
+
+      - type: horizontal-stack
+        cards:
+          - type: vertical-stack
+            cards:
+              - type: markdown
+                content: >-
+                  {{ states('input_text.dmd_p1_name') | default('Pump 1') }}
+                cadmd_mod:
+                  style: |
+                    ha-card {
+                      background: var(--p1-bg);
+                      border-left: 3px solid var(--p1-color);
+                      padding: 2px 8px;
+                      font-size: 12px;
+                      font-weight: bold;
+                      margin-bottom: 0;
+                    }
+              - type: glance
+                show_name: true
+                show_state: true
+                columns: 2
+                entities:
+                  - entity: input_number.dmd_p1_tank_remaining
+                    name: Restant (ml)
+                  - entity: sensor.dmd_p1_days_remaining
+                    name: Jours restants
+                cadmd_mod:
+                  style: |
+                    ha-card { margin-top: 0; }
+          - type: vertical-stack
+            cards:
+              - type: markdown
+                content: >-
+                  {{ states('input_text.dmd_p2_name') | default('Pump 2') }}
+                cadmd_mod:
+                  style: |
+                    ha-card {
+                      background: var(--p2-bg);
+                      border-left: 3px solid var(--p2-color);
+                      padding: 2px 8px;
+                      font-size: 12px;
+                      font-weight: bold;
+                      margin-bottom: 0;
+                    }
+              - type: glance
+                show_name: true
+                show_state: true
+                columns: 2
+                entities:
+                  - entity: input_number.dmd_p2_tank_remaining
+                    name: Restant (ml)
+                  - entity: sensor.dmd_p2_days_remaining
+                    name: Jours restants
+                cadmd_mod:
+                  style: |
+                    ha-card { margin-top: 0; }
+
+      - type: horizontal-stack
+        cards:
+          - type: vertical-stack
+            cards:
+              - type: markdown
+                content: >-
+                  {{ states('input_text.dmd_p3_name') | default('Pump 3') }}
+                cadmd_mod:
+                  style: |
+                    ha-card {
+                      background: var(--p3-bg);
+                      border-left: 3px solid var(--p3-color);
+                      padding: 2px 8px;
+                      font-size: 12px;
+                      font-weight: bold;
+                      margin-bottom: 0;
+                    }
+              - type: glance
+                show_name: true
+                show_state: true
+                columns: 2
+                entities:
+                  - entity: input_number.dmd_p3_tank_remaining
+                    name: Restant (ml)
+                  - entity: sensor.dmd_p3_days_remaining
+                    name: Jours restants
+                cadmd_mod:
+                  style: |
+                    ha-card { margin-top: 0; }
+          - type: vertical-stack
+            cards:
+              - type: markdown
+                content: >-
+                  {{ states('input_text.dmd_p4_name') | default('Pump 4') }}
+                cadmd_mod:
+                  style: |
+                    ha-card {
+                      background: var(--p4-bg);
+                      border-left: 3px solid var(--p4-color);
+                      padding: 2px 8px;
+                      font-size: 12px;
+                      font-weight: bold;
+                      margin-bottom: 0;
+                    }
+              - type: glance
+                show_name: true
+                show_state: true
+                columns: 2
+                entities:
+                  - entity: input_number.dmd_p4_tank_remaining
+                    name: Restant (ml)
+                  - entity: sensor.dmd_p4_days_remaining
+                    name: Jours restants
+                cadmd_mod:
+                  style: |
+                    ha-card { margin-top: 0; }
+
+      - type: horizontal-stack
+        cards:
+          - type: vertical-stack
+            cards:
+              - type: markdown
+                content: >-
+                  {{ states('input_text.dmd_p1_name') | default('Pump 1') }}
+                cadmd_mod:
+                  style: |
+                    ha-card {
+                      background: var(--p1-bg);
+                      border-left: 3px solid var(--p1-color);
+                      padding: 2px 8px;
+                      font-size: 12px;
+                      font-weight: bold;
+                      margin-bottom: 0;
+                    }
+              - type: glance
+                show_name: true
+                show_state: true
+                columns: 1
+                entities:
+                  - entity: counter.dmd_p1_daily_count
+                    name: "Doses aujourd'hui"
+                cadmd_mod:
+                  style: |
+                    ha-card { margin-top: 0; }
+          - type: vertical-stack
+            cards:
+              - type: markdown
+                content: >-
+                  {{ states('input_text.dmd_p2_name') | default('Pump 2') }}
+                cadmd_mod:
+                  style: |
+                    ha-card {
+                      background: var(--p2-bg);
+                      border-left: 3px solid var(--p2-color);
+                      padding: 2px 8px;
+                      font-size: 12px;
+                      font-weight: bold;
+                      margin-bottom: 0;
+                    }
+              - type: glance
+                show_name: true
+                show_state: true
+                columns: 1
+                entities:
+                  - entity: counter.dmd_p2_daily_count
+                    name: "Doses aujourd'hui"
+                cadmd_mod:
+                  style: |
+                    ha-card { margin-top: 0; }
+          - type: vertical-stack
+            cards:
+              - type: markdown
+                content: >-
+                  {{ states('input_text.dmd_p3_name') | default('Pump 3') }}
+                cadmd_mod:
+                  style: |
+                    ha-card {
+                      background: var(--p3-bg);
+                      border-left: 3px solid var(--p3-color);
+                      padding: 2px 8px;
+                      font-size: 12px;
+                      font-weight: bold;
+                      margin-bottom: 0;
+                    }
+              - type: glance
+                show_name: true
+                show_state: true
+                columns: 1
+                entities:
+                  - entity: counter.dmd_p3_daily_count
+                    name: "Doses aujourd'hui"
+                cadmd_mod:
+                  style: |
+                    ha-card { margin-top: 0; }
+          - type: vertical-stack
+            cards:
+              - type: markdown
+                content: >-
+                  {{ states('input_text.dmd_p4_name') | default('Pump 4') }}
+                cadmd_mod:
+                  style: |
+                    ha-card {
+                      background: var(--p4-bg);
+                      border-left: 3px solid var(--p4-color);
+                      padding: 2px 8px;
+                      font-size: 12px;
+                      font-weight: bold;
+                      margin-bottom: 0;
+                    }
+              - type: glance
+                show_name: true
+                show_state: true
+                columns: 1
+                entities:
+                  - entity: counter.dmd_p4_daily_count
+                    name: "Doses aujourd'hui"
+                cadmd_mod:
+                  style: |
+                    ha-card { margin-top: 0; }
+
+      - type: horizontal-stack
+        cards:
+          - type: vertical-stack
+            cards:
+              - type: markdown
+                content: >-
+                  {{ states('input_text.dmd_p1_name') | default('Pompe 1') }}
+                cadmd_mod:
+                  style: |
+                    ha-card {
+                      background: var(--p1-bg);
+                      border-left: 4px solid var(--p1-color);
+                      padding: 4px 8px;
+                    }
+              - type: custom:mushroom-entity-card
+                entity: input_boolean.dmd_p1_auto
+                name: "Auto"
+                icon: mdi:arrow-decision-auto-outline
+                tap_action:
+                  action: toggle
+                layout: horizontal
+                cadmd_mod:
+                  style: |
+                    ha-card {
+                      background: var(--p1-bg-light);
+                      border-left: 4px solid var(--p1-color);
+                    }
+              - type: custom:mushroom-template-card
+                primary: "Dose manuelle"
+                secondary: "{{ states('sensor.dmd_p1_dose_volume') }} ml - {{ states('sensor.dmd_p1_dose_duration') }} s"
+                icon: mdi:play-circle
+                icon_color: yellow
+                tap_action:
+                  action: call-service
+                  service: script.dmd_manual_dose_p1
+                layout: horizontal
+                cadmd_mod:
+                  style: |
+                    ha-card {
+                      background: var(--p1-bg-light);
+                      border-left: 4px solid var(--p1-color);
+                    }
+              - type: custom:mushroom-template-card
+                primary: "Derniere dose"
+                secondary: "{{ states('sensor.dmd_p1_time_since_dose') }}"
+                icon: mdi:clock-check
+                icon_color: grey
+                tap_action:
+                  action: none
+                layout: horizontal
+                cadmd_mod:
+                  style: |
+                    ha-card {
+                      background: var(--p1-bg-light);
+                      border-left: 4px solid var(--p1-color);
+                    }
+
+          - type: vertical-stack
+            cards:
+              - type: markdown
+                content: >-
+                  {{ states('input_text.dmd_p2_name') | default('Pompe 2') }}
+                cadmd_mod:
+                  style: |
+                    ha-card {
+                      background: var(--p2-bg);
+                      border-left: 4px solid var(--p2-color);
+                      padding: 4px 8px;
+                    }
+              - type: custom:mushroom-entity-card
+                entity: input_boolean.dmd_p2_auto
+                name: "Auto"
+                icon: mdi:arrow-decision-auto-outline
+                tap_action:
+                  action: toggle
+                layout: horizontal
+                cadmd_mod:
+                  style: |
+                    ha-card {
+                      background: var(--p2-bg-light);
+                      border-left: 4px solid var(--p2-color);
+                    }
+              - type: custom:mushroom-template-card
+                primary: "Dose manuelle"
+                secondary: "{{ states('sensor.dmd_p2_dose_volume') }} ml - {{ states('sensor.dmd_p2_dose_duration') }} s"
+                icon: mdi:play-circle
+                icon_color: pink
+                tap_action:
+                  action: call-service
+                  service: script.dmd_manual_dose_p2
+                layout: horizontal
+                cadmd_mod:
+                  style: |
+                    ha-card {
+                      background: var(--p2-bg-light);
+                      border-left: 4px solid var(--p2-color);
+                    }
+              - type: custom:mushroom-template-card
+                primary: "Derniere dose"
+                secondary: "{{ states('sensor.dmd_p2_time_since_dose') }}"
+                icon: mdi:clock-check
+                icon_color: grey
+                tap_action:
+                  action: none
+                layout: horizontal
+                cadmd_mod:
+                  style: |
+                    ha-card {
+                      background: var(--p2-bg-light);
+                      border-left: 4px solid var(--p2-color);
+                    }
+
+      - type: horizontal-stack
+        cards:
+          - type: vertical-stack
+            cards:
+              - type: markdown
+                content: >-
+                  {{ states('input_text.dmd_p3_name') | default('Pompe 3') }}
+                cadmd_mod:
+                  style: |
+                    ha-card {
+                      background: var(--p3-bg);
+                      border-left: 4px solid var(--p3-color);
+                      padding: 4px 8px;
+                    }
+              - type: custom:mushroom-entity-card
+                entity: input_boolean.dmd_p3_auto
+                name: "Auto"
+                icon: mdi:arrow-decision-auto-outline
+                tap_action:
+                  action: toggle
+                layout: horizontal
+                cadmd_mod:
+                  style: |
+                    ha-card {
+                      background: var(--p3-bg-light);
+                      border-left: 4px solid var(--p3-color);
+                    }
+              - type: custom:mushroom-template-card
+                primary: "Dose manuelle"
+                secondary: "{{ states('sensor.dmd_p3_dose_volume') }} ml - {{ states('sensor.dmd_p3_dose_duration') }} s"
+                icon: mdi:play-circle
+                icon_color: blue
+                tap_action:
+                  action: call-service
+                  service: script.dmd_manual_dose_p3
+                layout: horizontal
+                cadmd_mod:
+                  style: |
+                    ha-card {
+                      background: var(--p3-bg-light);
+                      border-left: 4px solid var(--p3-color);
+                    }
+              - type: custom:mushroom-template-card
+                primary: "Derniere dose"
+                secondary: "{{ states('sensor.dmd_p3_time_since_dose') }}"
+                icon: mdi:clock-check
+                icon_color: grey
+                tap_action:
+                  action: none
+                layout: horizontal
+                cadmd_mod:
+                  style: |
+                    ha-card {
+                      background: var(--p3-bg-light);
+                      border-left: 4px solid var(--p3-color);
+                    }
+
+          - type: vertical-stack
+            cards:
+              - type: markdown
+                content: >-
+                  {{ states('input_text.dmd_p4_name') | default('Pompe 4') }}
+                cadmd_mod:
+                  style: |
+                    ha-card {
+                      background: var(--p4-bg);
+                      border-left: 4px solid var(--p4-color);
+                      padding: 4px 8px;
+                    }
+              - type: custom:mushroom-entity-card
+                entity: input_boolean.dmd_p4_auto
+                name: "Auto"
+                icon: mdi:arrow-decision-auto-outline
+                tap_action:
+                  action: toggle
+                layout: horizontal
+                cadmd_mod:
+                  style: |
+                    ha-card {
+                      background: var(--p4-bg-light);
+                      border-left: 4px solid var(--p4-color);
+                    }
+              - type: custom:mushroom-template-card
+                primary: "Dose manuelle"
+                secondary: "{{ states('sensor.dmd_p4_dose_volume') }} ml - {{ states('sensor.dmd_p4_dose_duration') }} s"
+                icon: mdi:play-circle
+                icon_color: green
+                tap_action:
+                  action: call-service
+                  service: script.dmd_manual_dose_p4
+                layout: horizontal
+                cadmd_mod:
+                  style: |
+                    ha-card {
+                      background: var(--p4-bg-light);
+                      border-left: 4px solid var(--p4-color);
+                    }
+              - type: custom:mushroom-template-card
+                primary: "Derniere dose"
+                secondary: "{{ states('sensor.dmd_p4_time_since_dose') }}"
+                icon: mdi:clock-check
+                icon_color: grey
+                tap_action:
+                  action: none
+                layout: horizontal
+                cadmd_mod:
+                  style: |
+                    ha-card {
+                      background: var(--p4-bg-light);
+                      border-left: 4px solid var(--p4-color);
+                    }
+
+      - type: glance
+        title: "ESP32 DIY my Dose"
+        show_name: true
+        show_state: true
+        columns: 2
+        entities:
+          - entity: binary_sensor.dmd_status
+            name: Connexion
+          - entity: sensor.dmd_wifi
+            name: WiFi dBm
+          - entity: sensor.dmd_uptime
+            name: Uptime
+          - entity: sensor.dmd_ip
+            name: IP
+
+
+##################################################################################################################################
+#  VUE 2 : REGLAGES
+##################################################################################################################################
+
+  - title: Reglages
+    path: reglages
+    icon: mdi:cog
+    cards:
+
+      - type: entities
+        title: "Global"
+        show_header_toggle: false
+        entities:
+          - entity: input_number.dmd_dose_delay
+            name: "Délai mécanique entre doses (s)"
+
+      - type: markdown
+        content: >-
+          **Compatibilité des pompes**
+
+          Certains produits ne doivent pas être mélangés simultanément (ex: calcium et carbonate).
+          Définissez ici un délai minimum (en minutes) entre deux pompes.
+          DIY my Dose attendra automatiquement ce délai avant de déclencher la deuxième pompe.
+          **0 = pas de délai** (dosage simultané autorisé).
+        cadmd_mod:
+          style: |
+            ha-card {
+              background: rgba(255,255,255,0.03);
+              border-left: 4px solid #888;
+              font-size: 13px;
+              padding: 4px 8px;
+            }
+
+      - type: entities
+        title: "Compatibilite des pompes"
+        cadmd_mod:
+          style: |
+            ha-card { border-left: 4px solid #888; }
+        entities:
+          - entity: input_number.dmd_delay_p1_p2
+            name: "Pompe 1 → Pompe 2 (min)"
+          - entity: input_number.dmd_delay_p1_p3
+            name: "Pompe 1 → Pompe 3 (min)"
+          - entity: input_number.dmd_delay_p2_p3
+            name: "Pompe 2 → Pompe 3 (min)"
+          - entity: input_number.dmd_delay_p1_p4
+            name: "Pompe 1 → Pompe 4 (min)"
+          - entity: input_number.dmd_delay_p2_p4
+            name: "Pompe 2 → Pompe 4 (min)"
+          - entity: input_number.dmd_delay_p3_p4
+            name: "Pompe 3 → Pompe 4 (min)"
+
+      - type: horizontal-stack
+        cards:
+          - type: vertical-stack
+            cards:
+              - type: markdown
+                content: >-
+                  {{ states('input_text.dmd_p1_name') | default('Pompe 1') }}
+                cadmd_mod:
+                  style: |
+                    ha-card {
+                      background: var(--p1-bg);
+                      border-left: 4px solid var(--p1-color);
+                      padding: 4px 8px;
+                    }
+              - type: entities
+                entities:
+                  - entity: input_text.dmd_p1_name
+                    name: Nom de la pompe
+                  - entity: input_number.dmd_p1_daily_dose
+                    name: Dose quotidienne (ml)
+                  - entity: input_number.dmd_p1_frequency
+                    name: Doses par jour
+                  - type: custom:mushroom-template-card
+                    primary: "Decaler le planning apres une dose manuelle ?"
+                    secondary: >-
+                      {% if is_state('input_boolean.dmd_p1_manual_resets_cycle', 'on') %}
+                        Oui — l'auto repart depuis cette dose (ex: dose a 14h30 → prochaine a 14h30 + intervalle)
+                      {% else %}
+                        Non — l'auto continue son planning (ex: dose a 14h30 → prochaine auto a 15h00 comme prevu)
+                      {% endif %}
+                    icon: >-
+                      {% if is_state('input_boolean.dmd_p1_manual_resets_cycle', 'on') %}
+                        mdi:restart-alert
+                      {% else %}
+                        mdi:calendar-clock
+                      {% endif %}
+                    icon_color: >-
+                      {% if is_state('input_boolean.dmd_p1_manual_resets_cycle', 'on') %}
+                        orange
+                      {% else %}
+                        grey
+                      {% endif %}
+                    entity: input_boolean.dmd_p1_manual_resets_cycle
+                    tap_action:
+                      action: toggle
+                    layout: horizontal
+                  - entity: input_boolean.dmd_p1_full_day
+                    name: "Journee entiere (0h00-minuit)"
+                  - type: conditional
+                    conditions:
+                      - entity: input_boolean.dmd_p1_full_day
+                        state: 'off'
+                    row:
+                      entity: input_datetime.dmd_p1_start_time
+                      name: Heure de depart
+                  - type: conditional
+                    conditions:
+                      - entity: input_boolean.dmd_p1_full_day
+                        state: 'off'
+                    row:
+                      entity: input_datetime.dmd_p1_end_time
+                      name: Heure de fin
+                  - entity: sensor.dmd_p1_interval_min
+                    name: Intervalle (min)
+                  - entity: sensor.dmd_p1_window_ok
+                    name: Configuration invalide
+                  - entity: sensor.dmd_p1_next_dose
+                    name: Prochaine dose
+                  - entity: input_number.dmd_p1_tank_volume
+                    name: Volume reservoir (ml)
+                  - entity: input_number.dmd_p1_tank_remaining
+                    name: Volume restant (ml)
+                  - type: custom:mushroom-template-card
+                    primary: "Plein fait !"
+                    icon: mdi:barrel
+                    icon_color: var(--p1-color)
+                    tap_action:
+                      action: call-service
+                      service: script.dmd_tank_full_p1
+                    layout: horizontal
+                  - entity: input_number.dmd_p1_alert_threshold
+                    name: Seuil alerte (ml)
+                cadmd_mod:
+                  style: |
+                    ha-card { border-left: 4px solid var(--p1-color); }
+              - type: markdown
+                content: >-
+                  Calibration — {{ states('input_text.dmd_p1_name') | default('Pompe 1') }}
+                cadmd_mod:
+                  style: |
+                    ha-card {
+                      background: var(--p1-bg);
+                      border-left: 4px solid var(--p1-color);
+                      padding: 4px 8px;
+                    }
+              - type: entities
+                entities:
+                  - entity: input_boolean.dmd_p1_calib_mode
+                    name: "1. Activer"
+                  - entity: input_number.dmd_p1_calib_duration
+                    name: "2. Duree (s)"
+                  - entity: input_boolean.dmd_p1_calib_start
+                    name: "3. Lancer"
+                  - entity: input_number.dmd_p1_calib_volume
+                    name: "4. Volume recueilli (ml)"
+                  - entity: sensor.dmd_p1_flow_rate
+                    name: "Debit calcule (ml/s)"
+                cadmd_mod:
+                  style: |
+                    ha-card { border-left: 4px solid var(--p1-color); }
+
+          - type: vertical-stack
+            cards:
+              - type: markdown
+                content: >-
+                  {{ states('input_text.dmd_p2_name') | default('Pompe 2') }}
+                cadmd_mod:
+                  style: |
+                    ha-card {
+                      background: var(--p2-bg);
+                      border-left: 4px solid var(--p2-color);
+                      padding: 4px 8px;
+                    }
+              - type: entities
+                entities:
+                  - entity: input_text.dmd_p2_name
+                    name: Nom de la pompe
+                  - entity: input_number.dmd_p2_daily_dose
+                    name: Dose quotidienne (ml)
+                  - entity: input_number.dmd_p2_frequency
+                    name: Doses par jour
+                  - type: custom:mushroom-template-card
+                    primary: "Decaler le planning apres une dose manuelle ?"
+                    secondary: >-
+                      {% if is_state('input_boolean.dmd_p2_manual_resets_cycle', 'on') %}
+                        Oui — l'auto repart depuis cette dose (ex: dose a 14h30 → prochaine a 14h30 + intervalle)
+                      {% else %}
+                        Non — l'auto continue son planning (ex: dose a 14h30 → prochaine auto a 15h00 comme prevu)
+                      {% endif %}
+                    icon: >-
+                      {% if is_state('input_boolean.dmd_p2_manual_resets_cycle', 'on') %}
+                        mdi:restart-alert
+                      {% else %}
+                        mdi:calendar-clock
+                      {% endif %}
+                    icon_color: >-
+                      {% if is_state('input_boolean.dmd_p2_manual_resets_cycle', 'on') %}
+                        orange
+                      {% else %}
+                        grey
+                      {% endif %}
+                    entity: input_boolean.dmd_p2_manual_resets_cycle
+                    tap_action:
+                      action: toggle
+                    layout: horizontal
+                  - entity: input_boolean.dmd_p2_full_day
+                    name: "Journee entiere (0h00-minuit)"
+                  - type: conditional
+                    conditions:
+                      - entity: input_boolean.dmd_p2_full_day
+                        state: 'off'
+                    row:
+                      entity: input_datetime.dmd_p2_start_time
+                      name: Heure de depart
+                  - type: conditional
+                    conditions:
+                      - entity: input_boolean.dmd_p2_full_day
+                        state: 'off'
+                    row:
+                      entity: input_datetime.dmd_p2_end_time
+                      name: Heure de fin
+                  - entity: sensor.dmd_p2_interval_min
+                    name: Intervalle (min)
+                  - entity: sensor.dmd_p2_window_ok
+                    name: Configuration invalide
+                  - entity: sensor.dmd_p2_next_dose
+                    name: Prochaine dose
+                  - entity: input_number.dmd_p2_tank_volume
+                    name: Volume reservoir (ml)
+                  - entity: input_number.dmd_p2_tank_remaining
+                    name: Volume restant (ml)
+                  - type: custom:mushroom-template-card
+                    primary: "Plein fait !"
+                    icon: mdi:barrel
+                    icon_color: var(--p2-color)
+                    tap_action:
+                      action: call-service
+                      service: script.dmd_tank_full_p2
+                    layout: horizontal
+                  - entity: input_number.dmd_p2_alert_threshold
+                    name: Seuil alerte (ml)
+                cadmd_mod:
+                  style: |
+                    ha-card { border-left: 4px solid var(--p2-color); }
+              - type: markdown
+                content: >-
+                  Calibration — {{ states('input_text.dmd_p2_name') | default('Pompe 2') }}
+                cadmd_mod:
+                  style: |
+                    ha-card {
+                      background: var(--p2-bg);
+                      border-left: 4px solid var(--p2-color);
+                      padding: 4px 8px;
+                    }
+              - type: entities
+                entities:
+                  - entity: input_boolean.dmd_p2_calib_mode
+                    name: "1. Activer"
+                  - entity: input_number.dmd_p2_calib_duration
+                    name: "2. Duree (s)"
+                  - entity: input_boolean.dmd_p2_calib_start
+                    name: "3. Lancer"
+                  - entity: input_number.dmd_p2_calib_volume
+                    name: "4. Volume recueilli (ml)"
+                  - entity: sensor.dmd_p2_flow_rate
+                    name: "Debit calcule (ml/s)"
+                cadmd_mod:
+                  style: |
+                    ha-card { border-left: 4px solid var(--p2-color); }
+
+      - type: horizontal-stack
+        cards:
+          - type: vertical-stack
+            cards:
+              - type: markdown
+                content: >-
+                  {{ states('input_text.dmd_p3_name') | default('Pompe 3') }}
+                cadmd_mod:
+                  style: |
+                    ha-card {
+                      background: var(--p3-bg);
+                      border-left: 4px solid var(--p3-color);
+                      padding: 4px 8px;
+                    }
+              - type: entities
+                entities:
+                  - entity: input_text.dmd_p3_name
+                    name: Nom de la pompe
+                  - entity: input_number.dmd_p3_daily_dose
+                    name: Dose quotidienne (ml)
+                  - entity: input_number.dmd_p3_frequency
+                    name: Doses par jour
+                  - type: custom:mushroom-template-card
+                    primary: "Decaler le planning apres une dose manuelle ?"
+                    secondary: >-
+                      {% if is_state('input_boolean.dmd_p3_manual_resets_cycle', 'on') %}
+                        Oui — l'auto repart depuis cette dose (ex: dose a 14h30 → prochaine a 14h30 + intervalle)
+                      {% else %}
+                        Non — l'auto continue son planning (ex: dose a 14h30 → prochaine auto a 15h00 comme prevu)
+                      {% endif %}
+                    icon: >-
+                      {% if is_state('input_boolean.dmd_p3_manual_resets_cycle', 'on') %}
+                        mdi:restart-alert
+                      {% else %}
+                        mdi:calendar-clock
+                      {% endif %}
+                    icon_color: >-
+                      {% if is_state('input_boolean.dmd_p3_manual_resets_cycle', 'on') %}
+                        orange
+                      {% else %}
+                        grey
+                      {% endif %}
+                    entity: input_boolean.dmd_p3_manual_resets_cycle
+                    tap_action:
+                      action: toggle
+                    layout: horizontal
+                  - entity: input_boolean.dmd_p3_full_day
+                    name: "Journee entiere (0h00-minuit)"
+                  - type: conditional
+                    conditions:
+                      - entity: input_boolean.dmd_p3_full_day
+                        state: 'off'
+                    row:
+                      entity: input_datetime.dmd_p3_start_time
+                      name: Heure de depart
+                  - type: conditional
+                    conditions:
+                      - entity: input_boolean.dmd_p3_full_day
+                        state: 'off'
+                    row:
+                      entity: input_datetime.dmd_p3_end_time
+                      name: Heure de fin
+                  - entity: sensor.dmd_p3_interval_min
+                    name: Intervalle (min)
+                  - entity: sensor.dmd_p3_window_ok
+                    name: Configuration invalide
+                  - entity: sensor.dmd_p3_next_dose
+                    name: Prochaine dose
+                  - entity: input_number.dmd_p3_tank_volume
+                    name: Volume reservoir (ml)
+                  - entity: input_number.dmd_p3_tank_remaining
+                    name: Volume restant (ml)
+                  - type: custom:mushroom-template-card
+                    primary: "Plein fait !"
+                    icon: mdi:barrel
+                    icon_color: var(--p3-color)
+                    tap_action:
+                      action: call-service
+                      service: script.dmd_tank_full_p3
+                    layout: horizontal
+                  - entity: input_number.dmd_p3_alert_threshold
+                    name: Seuil alerte (ml)
+                cadmd_mod:
+                  style: |
+                    ha-card { border-left: 4px solid var(--p3-color); }
+              - type: markdown
+                content: >-
+                  Calibration — {{ states('input_text.dmd_p3_name') | default('Pompe 3') }}
+                cadmd_mod:
+                  style: |
+                    ha-card {
+                      background: var(--p3-bg);
+                      border-left: 4px solid var(--p3-color);
+                      padding: 4px 8px;
+                    }
+              - type: entities
+                entities:
+                  - entity: input_boolean.dmd_p3_calib_mode
+                    name: "1. Activer"
+                  - entity: input_number.dmd_p3_calib_duration
+                    name: "2. Duree (s)"
+                  - entity: input_boolean.dmd_p3_calib_start
+                    name: "3. Lancer"
+                  - entity: input_number.dmd_p3_calib_volume
+                    name: "4. Volume recueilli (ml)"
+                  - entity: sensor.dmd_p3_flow_rate
+                    name: "Debit calcule (ml/s)"
+                cadmd_mod:
+                  style: |
+                    ha-card { border-left: 4px solid var(--p3-color); }
+
+          - type: vertical-stack
+            cards:
+              - type: markdown
+                content: >-
+                  {{ states('input_text.dmd_p4_name') | default('Pompe 4') }}
+                cadmd_mod:
+                  style: |
+                    ha-card {
+                      background: var(--p4-bg);
+                      border-left: 4px solid var(--p4-color);
+                      padding: 4px 8px;
+                    }
+              - type: entities
+                entities:
+                  - entity: input_text.dmd_p4_name
+                    name: Nom de la pompe
+                  - entity: input_number.dmd_p4_daily_dose
+                    name: Dose quotidienne (ml)
+                  - entity: input_number.dmd_p4_frequency
+                    name: Doses par jour
+                  - type: custom:mushroom-template-card
+                    primary: "Decaler le planning apres une dose manuelle ?"
+                    secondary: >-
+                      {% if is_state('input_boolean.dmd_p4_manual_resets_cycle', 'on') %}
+                        Oui — l'auto repart depuis cette dose (ex: dose a 14h30 → prochaine a 14h30 + intervalle)
+                      {% else %}
+                        Non — l'auto continue son planning (ex: dose a 14h30 → prochaine auto a 15h00 comme prevu)
+                      {% endif %}
+                    icon: >-
+                      {% if is_state('input_boolean.dmd_p4_manual_resets_cycle', 'on') %}
+                        mdi:restart-alert
+                      {% else %}
+                        mdi:calendar-clock
+                      {% endif %}
+                    icon_color: >-
+                      {% if is_state('input_boolean.dmd_p4_manual_resets_cycle', 'on') %}
+                        orange
+                      {% else %}
+                        grey
+                      {% endif %}
+                    entity: input_boolean.dmd_p4_manual_resets_cycle
+                    tap_action:
+                      action: toggle
+                    layout: horizontal
+                  - entity: input_boolean.dmd_p4_full_day
+                    name: "Journee entiere (0h00-minuit)"
+                  - type: conditional
+                    conditions:
+                      - entity: input_boolean.dmd_p4_full_day
+                        state: 'off'
+                    row:
+                      entity: input_datetime.dmd_p4_start_time
+                      name: Heure de depart
+                  - type: conditional
+                    conditions:
+                      - entity: input_boolean.dmd_p4_full_day
+                        state: 'off'
+                    row:
+                      entity: input_datetime.dmd_p4_end_time
+                      name: Heure de fin
+                  - entity: sensor.dmd_p4_interval_min
+                    name: Intervalle (min)
+                  - entity: sensor.dmd_p4_window_ok
+                    name: Configuration invalide
+                  - entity: sensor.dmd_p4_next_dose
+                    name: Prochaine dose
+                  - entity: input_number.dmd_p4_tank_volume
+                    name: Volume reservoir (ml)
+                  - entity: input_number.dmd_p4_tank_remaining
+                    name: Volume restant (ml)
+                  - type: custom:mushroom-template-card
+                    primary: "Plein fait !"
+                    icon: mdi:barrel
+                    icon_color: var(--p4-color)
+                    tap_action:
+                      action: call-service
+                      service: script.dmd_tank_full_p4
+                    layout: horizontal
+                  - entity: input_number.dmd_p4_alert_threshold
+                    name: Seuil alerte (ml)
+                cadmd_mod:
+                  style: |
+                    ha-card { border-left: 4px solid var(--p4-color); }
+              - type: markdown
+                content: >-
+                  Calibration — {{ states('input_text.dmd_p4_name') | default('Pompe 4') }}
+                cadmd_mod:
+                  style: |
+                    ha-card {
+                      background: var(--p4-bg);
+                      border-left: 4px solid var(--p4-color);
+                      padding: 4px 8px;
+                    }
+              - type: entities
+                entities:
+                  - entity: input_boolean.dmd_p4_calib_mode
+                    name: "1. Activer"
+                  - entity: input_number.dmd_p4_calib_duration
+                    name: "2. Duree (s)"
+                  - entity: input_boolean.dmd_p4_calib_start
+                    name: "3. Lancer"
+                  - entity: input_number.dmd_p4_calib_volume
+                    name: "4. Volume recueilli (ml)"
+                  - entity: sensor.dmd_p4_flow_rate
+                    name: "Debit calcule (ml/s)"
+                cadmd_mod:
+                  style: |
+                    ha-card { border-left: 4px solid var(--p4-color); }
+
+
+##################################################################################################################################
+#  VUE 3 : STATISTIQUES
+##################################################################################################################################
+
+  - title: Statistiques
+    path: stats
+    icon: mdi:chart-line
+    cards:
+
+      - type: horizontal-stack
+        cards:
+          - type: vertical-stack
+            cards:
+              - type: markdown
+                content: >-
+                  {{ states('input_text.dmd_p1_name') | default('Pompe 1') }}
+                cadmd_mod:
+                  style: |
+                    ha-card {
+                      background: var(--p1-bg);
+                      border-left: 4px solid var(--p1-color);
+                      padding: 4px 8px;
+                    }
+              - type: entities
+                entities:
+                  - entity: sensor.dmd_p1_weekly_volume
+                    name: Cette semaine
+                  - entity: sensor.dmd_p1_monthly_volume
+                    name: Ce mois
+                  - entity: sensor.dmd_p1_yearly_volume
+                    name: Cette annee
+                  - entity: input_number.dmd_p1_total_volume
+                    name: Total
+                  - entity: input_number.dmd_p1_total_doses
+                    name: Doses totales
+                  - entity: input_number.dmd_p1_missed_doses
+                    name: Doses manquees
+                  - entity: input_datetime.dmd_p1_last_dose
+                    name: Derniere dose
+                  - entity: sensor.dmd_p1_time_since_dose
+                    name: Il y a
+                cadmd_mod:
+                  style: |
+                    ha-card { border-left: 4px solid var(--p1-color); }
+
+          - type: vertical-stack
+            cards:
+              - type: markdown
+                content: >-
+                  {{ states('input_text.dmd_p2_name') | default('Pompe 2') }}
+                cadmd_mod:
+                  style: |
+                    ha-card {
+                      background: var(--p2-bg);
+                      border-left: 4px solid var(--p2-color);
+                      padding: 4px 8px;
+                    }
+              - type: entities
+                entities:
+                  - entity: sensor.dmd_p2_weekly_volume
+                    name: Cette semaine
+                  - entity: sensor.dmd_p2_monthly_volume
+                    name: Ce mois
+                  - entity: sensor.dmd_p2_yearly_volume
+                    name: Cette annee
+                  - entity: input_number.dmd_p2_total_volume
+                    name: Total
+                  - entity: input_number.dmd_p2_total_doses
+                    name: Doses totales
+                  - entity: input_number.dmd_p2_missed_doses
+                    name: Doses manquees
+                  - entity: input_datetime.dmd_p2_last_dose
+                    name: Derniere dose
+                  - entity: sensor.dmd_p2_time_since_dose
+                    name: Il y a
+                cadmd_mod:
+                  style: |
+                    ha-card { border-left: 4px solid var(--p2-color); }
+
+      - type: horizontal-stack
+        cards:
+          - type: vertical-stack
+            cards:
+              - type: markdown
+                content: >-
+                  {{ states('input_text.dmd_p3_name') | default('Pompe 3') }}
+                cadmd_mod:
+                  style: |
+                    ha-card {
+                      background: var(--p3-bg);
+                      border-left: 4px solid var(--p3-color);
+                      padding: 4px 8px;
+                    }
+              - type: entities
+                entities:
+                  - entity: sensor.dmd_p3_weekly_volume
+                    name: Cette semaine
+                  - entity: sensor.dmd_p3_monthly_volume
+                    name: Ce mois
+                  - entity: sensor.dmd_p3_yearly_volume
+                    name: Cette annee
+                  - entity: input_number.dmd_p3_total_volume
+                    name: Total
+                  - entity: input_number.dmd_p3_total_doses
+                    name: Doses totales
+                  - entity: input_number.dmd_p3_missed_doses
+                    name: Doses manquees
+                  - entity: input_datetime.dmd_p3_last_dose
+                    name: Derniere dose
+                  - entity: sensor.dmd_p3_time_since_dose
+                    name: Il y a
+                cadmd_mod:
+                  style: |
+                    ha-card { border-left: 4px solid var(--p3-color); }
+
+          - type: vertical-stack
+            cards:
+              - type: markdown
+                content: >-
+                  {{ states('input_text.dmd_p4_name') | default('Pompe 4') }}
+                cadmd_mod:
+                  style: |
+                    ha-card {
+                      background: var(--p4-bg);
+                      border-left: 4px solid var(--p4-color);
+                      padding: 4px 8px;
+                    }
+              - type: entities
+                entities:
+                  - entity: sensor.dmd_p4_weekly_volume
+                    name: Cette semaine
+                  - entity: sensor.dmd_p4_monthly_volume
+                    name: Ce mois
+                  - entity: sensor.dmd_p4_yearly_volume
+                    name: Cette annee
+                  - entity: input_number.dmd_p4_total_volume
+                    name: Total
+                  - entity: input_number.dmd_p4_total_doses
+                    name: Doses totales
+                  - entity: input_number.dmd_p4_missed_doses
+                    name: Doses manquees
+                  - entity: input_datetime.dmd_p4_last_dose
+                    name: Derniere dose
+                  - entity: sensor.dmd_p4_time_since_dose
+                    name: Il y a
+                cadmd_mod:
+                  style: |
+                    ha-card { border-left: 4px solid var(--p4-color); }
+
+      - type: custom:mini-graph-card
+        title: "Niveaux reservoirs - 7 derniers jours"
+        hours_to_show: 168
+        points_per_hour: 1
+        line_width: 2
+        show:
+          legend: true
+          fill: true
+        entities:
+          - entity: input_number.dmd_p1_tank_remaining
+            color: *kh_color
+          - entity: input_number.dmd_p2_tank_remaining
+            color: *ca_color
+          - entity: input_number.dmd_p3_tank_remaining
+            color: *mg_color
+          - entity: input_number.dmd_p4_tank_remaining
+            color: *ph_color
