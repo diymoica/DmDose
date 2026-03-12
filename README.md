@@ -1,4 +1,4 @@
-# ReefDose — Universal Smart Dosing Controller
+# DIY my Dose — Universal Smart Dosing Controller
 
 ![Version](https://img.shields.io/badge/version-0.9.8-blue)
 ![Status](https://img.shields.io/badge/status-pre--release-orange)
@@ -15,7 +15,7 @@
 
 ### Overview
 
-ReefDose is a universal liquid dosing controller built on Home Assistant and ESP32 (ESPHome).
+DIY my Dose is a universal liquid dosing controller built on Home Assistant and ESP32 (ESPHome).
 It controls up to 4 peristaltic pumps with automatic dosing, precise calibration, safety checks, alerts and statistics.
 
 **Designed for any liquid dosing use case :**
@@ -42,6 +42,9 @@ No logic is imposed : you decide everything.
 - **Mechanical delay** — configurable delay between sequential doses (1–30s)
 - **Real-time validation** — warning if window is too short for requested frequency
 - **Global pause** — stops all pumps instantly
+
+#### Hardware
+- **Physical manual dose button** — a hardware button on the ESP32 triggers a manual dose, works even without dashboard access *(coming in v1.1.0)*
 
 #### Simulation
 - **Simulation mode** — test full timing and sequencing without affecting real data
@@ -88,29 +91,29 @@ No logic is imposed : you decide everything.
 
 ### Project architecture
 
-#### Package files (`packages/reefdose/`)
+#### Package files (`packages/DMDose/`)
 
 The core logic — split into 5 files for readability:
 
 | File | Role |
 |---|---|
-| `rd_config.yaml` | All configurable parameters (names, doses, windows, delays, simulation...) |
-| `rd_sensors.yaml` | Calculated sensors (interval, next dose, window validation, tank levels...) |
-| `rd_scripts.yaml` | Triggerable actions (manual dose, calibration, tank reset, full reset...) |
-| `rd_stat.yaml` | Statistics (volumes, counters, timestamps, missed doses...) |
-| `rd_automations.yaml` | Automatic logic (schedules doses, sends alerts, handles compatibility delays...) |
+| `dmd_config.yaml` | All configurable parameters (names, doses, windows, delays, simulation...) |
+| `dmd_sensors.yaml` | Calculated sensors (interval, next dose, window validation, tank levels...) |
+| `dmd_scripts.yaml` | Triggerable actions (manual dose, calibration, tank reset, full reset...) |
+| `dmd_stat.yaml` | Statistics (volumes, counters, timestamps, missed doses...) |
+| `dmd_automations.yaml` | Automatic logic (schedules doses, sends alerts, handles compatibility delays...) |
 
 > These 5 files are **identical regardless of language**. No editing needed — everything is configured from the dashboard.
 
 #### The `common/` folder (`packages/common/notify.yaml`)
 
-Defines the `notify.reefdose_admin` service used for all alerts.
+Defines the `notify.dmd_admin` service used for all alerts.
 Lives in `common/` so it can be shared with other projects on the same HA instance.
 **This is the only file you need to edit** — just point it to your mobile device.
 
 #### DMC Theme (`themes/dmc_theme.yaml`)
 
-ReefDose uses CSS variables to colorize each pump. Without the theme, all card colors disappear.
+DIY my Dose uses CSS variables to colorize each pump. Without the theme, all card colors disappear.
 
 | Theme variable | Used for |
 |---|---|
@@ -131,10 +134,10 @@ Copy only one to HA. Four files available:
 
 | File | Language | Format |
 |---|---|---|
-| `dashboard_reefdose_desktop_fr.yaml` | 🇫🇷 Français | Desktop / PC |
-| `dashboard_reefdose_desktop_en.yaml` | 🇬🇧 English | Desktop / PC |
-| `dashboard_reefdose_mobile_fr.yaml` | 🇫🇷 Français | Mobile |
-| `dashboard_reefdose_mobile_en.yaml` | 🇬🇧 English | Mobile |
+| `dashboadmd_dmd_desktop_fr.yaml` | 🇫🇷 Français | Desktop / PC |
+| `dashboadmd_dmd_desktop_en.yaml` | 🇬🇧 English | Desktop / PC |
+| `dashboadmd_dmd_mobile_fr.yaml` | 🇫🇷 Français | Mobile |
+| `dashboadmd_dmd_mobile_en.yaml` | 🇬🇧 English | Mobile |
 
 #### Translations (`translations/`) — GitHub only
 
@@ -144,7 +147,7 @@ Reference files for contributing dashboards in other languages. Do not upload to
 
 ### Required hardware
 
-- ESP32 with ESPHome — 4 relay switches named `switch.reefdose_pompe_1` to `_4`
+- ESP32 with ESPHome — 4 relay switches named `switch.dmd_pompe_1` to `_4`
 - Home Assistant 2023.x or higher
 
 ### Required HACS cards
@@ -172,12 +175,12 @@ config/
 └── packages/
     ├── common/
     │   └── notify.yaml          ← edit this: point to your mobile device
-    └── reefdose/
-        ├── rd_config.yaml
-        ├── rd_stat.yaml
-        ├── rd_sensors.yaml
-        ├── rd_scripts.yaml
-        └── rd_automations.yaml
+    └── DMDose/
+        ├── dmd_config.yaml
+        ├── dmd_stat.yaml
+        ├── dmd_sensors.yaml
+        ├── dmd_scripts.yaml
+        └── dmd_automations.yaml
 ```
 
 **3. Copy the theme**
@@ -232,7 +235,7 @@ Edit `packages/common/notify.yaml` to match your mobile device:
 ```yaml
 notify:
   - platform: group
-    name: reefdose_admin
+    name: dmd_admin
     services:
       - service: mobile_app_your_device
 ```
@@ -254,7 +257,7 @@ Translation files are in `translations/`. To add a new language:
 The hardware design (peristaltic pump wiring, ESP32 setup) is based on a build
 originally published on **[Joy-Reef.com](https://www.joy-reef.com/)**.
 
-ReefDose is a complete software rewrite — the original used an Arduino with cloud connectivity.
+DIY my Dose is a complete software rewrite — the original used an Arduino with cloud connectivity.
 This project replaces that with a fully local ESP32 + ESPHome solution integrated into Home Assistant, with no cloud dependency.
 
 > If you know of earlier sources that inspired the Joy-Reef hardware design,
@@ -278,7 +281,7 @@ See [LICENSE](LICENSE) for full terms.
 
 ### Présentation
 
-ReefDose est un contrôleur de dosage liquide universel basé sur Home Assistant et ESP32 (ESPHome).
+DIY my Dose est un contrôleur de dosage liquide universel basé sur Home Assistant et ESP32 (ESPHome).
 Il pilote jusqu'à 4 pompes péristaltiques avec dosage automatique, calibration précise, sécurités, alertes et statistiques.
 
 **Conçu pour tout usage de dosage liquide :**
@@ -305,6 +308,9 @@ Aucune logique n'est imposée : vous décidez de tout.
 - **Délai mécanique** — délai configurable entre doses séquentielles (1–30s)
 - **Validation en temps réel** — alerte si la fenêtre est trop courte pour la fréquence demandée
 - **Pause globale** — arrête toutes les pompes instantanément
+
+#### Matériel
+- **Bouton de dose manuelle physique** — un bouton hardware sur l'ESP32 déclenche une dose manuelle, fonctionne même sans accès au dashboard *(prévu en v1.1.0)*
 
 #### Simulation
 - **Mode simulation** — testez le timing complet sans affecter les données réelles
@@ -351,29 +357,29 @@ Aucune logique n'est imposée : vous décidez de tout.
 
 ### Architecture du projet
 
-#### Les fichiers package (`packages/reefdose/`)
+#### Les fichiers package (`packages/DMDose/`)
 
 Le cœur du projet — découpé en 5 fichiers pour rester lisible :
 
 | Fichier | Rôle |
 |---|---|
-| `rd_config.yaml` | Tous les paramètres configurables (noms, doses, fenêtres, délais, simulation...) |
-| `rd_sensors.yaml` | Les capteurs calculés (intervalle, prochaine dose, validation fenêtre, niveaux...) |
-| `rd_scripts.yaml` | Les actions déclenchables (dose manuelle, calibration, reset réservoir, reset total...) |
-| `rd_stat.yaml` | Les statistiques (volumes, compteurs, horodatages, doses manquées...) |
-| `rd_automations.yaml` | La logique automatique (planifie les doses, envoie les alertes, gère les délais...) |
+| `dmd_config.yaml` | Tous les paramètres configurables (noms, doses, fenêtres, délais, simulation...) |
+| `dmd_sensors.yaml` | Les capteurs calculés (intervalle, prochaine dose, validation fenêtre, niveaux...) |
+| `dmd_scripts.yaml` | Les actions déclenchables (dose manuelle, calibration, reset réservoir, reset total...) |
+| `dmd_stat.yaml` | Les statistiques (volumes, compteurs, horodatages, doses manquées...) |
+| `dmd_automations.yaml` | La logique automatique (planifie les doses, envoie les alertes, gère les délais...) |
 
 > Ces 5 fichiers sont **identiques quelle que soit la langue choisie**. Aucune modification nécessaire — tout se configure depuis le dashboard.
 
 #### Le dossier `common/` (`packages/common/notify.yaml`)
 
-Définit le service `notify.reefdose_admin` utilisé pour toutes les alertes.
+Définit le service `notify.dmd_admin` utilisé pour toutes les alertes.
 Dans `common/` pour pouvoir être partagé avec d'autres projets sur le même HA.
 **C'est le seul fichier à modifier** — indiquez simplement votre appareil mobile.
 
 #### Le thème DMC (`themes/dmc_theme.yaml`)
 
-ReefDose utilise des variables CSS pour coloriser chaque pompe. Sans le thème, toutes les couleurs disparaissent.
+DIY my Dose utilise des variables CSS pour coloriser chaque pompe. Sans le thème, toutes les couleurs disparaissent.
 
 | Variable dans le thème | Utilisation |
 |---|---|
@@ -394,10 +400,10 @@ N'en copier qu'un seul sur HA. Quatre fichiers disponibles :
 
 | Fichier | Langue | Format |
 |---|---|---|
-| `dashboard_reefdose_desktop_fr.yaml` | 🇫🇷 Français | Desktop / PC |
-| `dashboard_reefdose_desktop_en.yaml` | 🇬🇧 English | Desktop / PC |
-| `dashboard_reefdose_mobile_fr.yaml` | 🇫🇷 Français | Mobile |
-| `dashboard_reefdose_mobile_en.yaml` | 🇬🇧 English | Mobile |
+| `dashboadmd_dmd_desktop_fr.yaml` | 🇫🇷 Français | Desktop / PC |
+| `dashboadmd_dmd_desktop_en.yaml` | 🇬🇧 English | Desktop / PC |
+| `dashboadmd_dmd_mobile_fr.yaml` | 🇫🇷 Français | Mobile |
+| `dashboadmd_dmd_mobile_en.yaml` | 🇬🇧 English | Mobile |
 
 #### Les traductions (`translations/`) — GitHub uniquement
 
@@ -407,7 +413,7 @@ Fichiers de référence pour contribuer des dashboards dans d'autres langues. Ne
 
 ### Matériel requis
 
-- ESP32 avec ESPHome — 4 relais nommés `switch.reefdose_pompe_1` à `_4`
+- ESP32 avec ESPHome — 4 relais nommés `switch.dmd_pompe_1` à `_4`
 - Home Assistant 2023.x ou supérieur
 
 ### Cartes HACS requises
@@ -435,12 +441,12 @@ config/
 └── packages/
     ├── common/
     │   └── notify.yaml          ← à modifier : indiquer votre appareil mobile
-    └── reefdose/
-        ├── rd_config.yaml
-        ├── rd_stat.yaml
-        ├── rd_sensors.yaml
-        ├── rd_scripts.yaml
-        └── rd_automations.yaml
+    └── DMDose/
+        ├── dmd_config.yaml
+        ├── dmd_stat.yaml
+        ├── dmd_sensors.yaml
+        ├── dmd_scripts.yaml
+        └── dmd_automations.yaml
 ```
 
 **3. Copier le thème**
@@ -495,7 +501,7 @@ Modifier `packages/common/notify.yaml` :
 ```yaml
 notify:
   - platform: group
-    name: reefdose_admin
+    name: dmd_admin
     services:
       - service: mobile_app_votre_appareil
 ```
@@ -517,7 +523,7 @@ Les fichiers de traduction sont dans `translations/`. Pour ajouter une nouvelle 
 Le montage électronique (câblage des pompes péristaltiques, configuration ESP32)
 est basé sur un montage publié à l'origine sur **[Joy-Reef.com](https://www.joy-reef.com/)**.
 
-ReefDose est une réécriture logicielle complète — le montage original utilisait un Arduino avec une connexion cloud.
+DIY my Dose est une réécriture logicielle complète — le montage original utilisait un Arduino avec une connexion cloud.
 Ce projet le remplace par une solution entièrement locale ESP32 + ESPHome intégrée à Home Assistant, sans aucune dépendance cloud.
 
 > Si vous connaissez des sources antérieures qui ont inspiré le montage Joy-Reef,
