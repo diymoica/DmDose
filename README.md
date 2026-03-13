@@ -1,7 +1,7 @@
 # DIY my Dose — Universal Smart Dosing Controller
 
-![Version](https://img.shields.io/badge/version-0.9.8-blue)
-![Status](https://img.shields.io/badge/status-pre--release-orange)
+![Version](https://img.shields.io/badge/version-0.9.9-blue)
+![Status](https://img.shields.io/badge/status-stable-green)
 ![HA](https://img.shields.io/badge/Home%20Assistant-2023.x%2B-41BDF5)
 ![ESPHome](https://img.shields.io/badge/ESPHome-required-green)
 ![License](https://img.shields.io/badge/license-Custom-lightgrey)
