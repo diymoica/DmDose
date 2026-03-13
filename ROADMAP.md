@@ -6,14 +6,14 @@
 
 ## English
 
-### Current status : v0.9.8 — Pre-release testing
+### Current status : v0.9.9 — Stable
 
 The project is actively tested on a real reef aquarium.
 Core dosing features are functional and validated over 48h continuous run. First stable release available now.
 
 ---
 
-### ✅ Already available (v0.9.8)
+### ✅ Already available (v0.9.9)
 
 - Automatic dosing — 4 pumps, configurable time window per pump
 - Full day mode — clock-aligned dosing (e.g. 24 doses → every hour at :00)
@@ -99,14 +99,14 @@ Package DmD as a proper HACS integration so users can install, update, and **uni
 
 ## Français
 
-### État actuel : v0.9.8 — Tests pré-release
+### État actuel : v0.9.9 — Stable
 
 Le projet est testé activement sur un aquarium récifal réel.
 Les fonctionnalités de dosage sont opérationnelles et validées sur un run continu de 48h. Première release stable disponible.
 
 ---
 
-### ✅ Déjà disponible (v0.9.8)
+### ✅ Déjà disponible (v0.9.9)
 
 - Dosage automatique — 4 pompes, fenêtre horaire configurable par pompe
 - Mode jour entier — dosage aligné sur l'horloge (ex : 24 doses → toutes les heures à :00)
